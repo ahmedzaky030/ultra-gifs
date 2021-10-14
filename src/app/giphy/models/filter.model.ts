@@ -1,7 +1,7 @@
 export interface SearchFilter {
     q: string;
-    limit: number;
-    offset: number;
+    limit?: number;
+    offset?: number;
     rating?: string;
     lang?: string;
 }

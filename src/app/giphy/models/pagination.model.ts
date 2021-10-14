@@ -1,5 +1,5 @@
 export interface Pagination {
-    offset: number;
-    total_count: number;
-    count: number;
+    offset: number | undefined;
+    total_count: number | undefined;
+    count: number | undefined;
 }

@@ -1,0 +1,28 @@
+<form class="form-inline md-form form-sm">
+    <mdb-icon fas icon="search" aria-hidden="true"></mdb-icon>
+    <input class="form-control form-control-sm ml-3 w-75" type="text" [formControl]="searchFormControl" placeholder="Search" aria-label="Search"
+      mdbInput>
+  </form>
+  <div class="suggestions-container">
+    <div class="chip" *ngFor="let tag of tags" (click)="searchByTag(tag)">{{tag.name}}</div>
+  </div>
+  <div class="suggestions-container selected">
+    <div class="chip" *ngFor="let tag of selectedTags">
+        {{tag.name}}
+        <mdb-icon fas icon="times" (click)="removeSelectedTag(tag)" aria-hidden="true"></mdb-icon>
+    </div>
+  </div>
+  
+<div class="gifs-container">
+    <div *ngFor="let item of items " class="item">
+        <img src="{{item?.images?.fixed_width?.url}}" [width]="item?.images?.fixed_width?.width" />
+    </div>
+    
+</div>
+<div class="pagination">
+    <ngb-pagination
+    [(page)]="page"
+    [pageSize]="pageSize"
+    [collectionSize]=" totalCount"></ngb-pagination>
+</div>
+
