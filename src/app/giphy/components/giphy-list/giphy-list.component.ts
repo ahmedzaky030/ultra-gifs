@@ -9,6 +9,7 @@ import { Term } from '../../models/term.model';
 import { GiphySearchService } from '../../service/giphy-search.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Config } from '../../config/constants';
+import { SearchFilter } from '../../models/filter.model';
 
 @UntilDestroy()
 @Component({
@@ -19,26 +20,29 @@ import { Config } from '../../config/constants';
 export class GiphyListComponent implements OnInit {
   page = Config.INITIAL_PAGE_NUMBER;
   totalCount = Config.TOTAL_COUNT;
-  pagination: Pagination | undefined = { count: Config.GIFS_PER_PAGE, total_count: Config.GIFS_PER_PAGE*2 , offset: Config.OFFSET };
+  pagination: Pagination;
   items: GifModel[] = [];
   pageSize = Config.GIFS_PER_PAGE;
   tags: Term[] = [];
   selectedTags: Term[] = [];
   searchFormControl: FormControl = new FormControl(Config.INITIAL_SEARCH_TEXT);
 
-  constructor(private giphySearchService: GiphySearchService){}
+  constructor(private giphySearchService: GiphySearchService){
+    this.pagination = { count: Config.GIFS_PER_PAGE, total_count: Config.GIFS_PER_PAGE*2 , offset: Config.OFFSET };
+  }
 
-  ngOnInit(){
+  ngOnInit(){  
     this.getGifs(this.searchFormControl.value).subscribe(res => this.successCallback(res));
     this.onSearchChanged();
   }
 
   searchGifs(search: string): Observable<ApiResponse<GifModel>> {
-    return this.giphySearchService.getGifs({offset: this.pagination?.offset, limit: this.pagination?.count , q:search});
+    const filter : SearchFilter = {offset: this.pagination?.offset, limit: this.pagination?.count , q:search};
+    return this.giphySearchService.getGifs(filter);
   }
 
   getSearchSuggestions(term: string) : Observable<ApiResponse<Term>> {
-    return term ? this.giphySearchService.getSearchSuggestions(term): of(({data: [], meta: { msg:'', response_id:'', status:404}}) as ApiResponse<Term>);
+    return term ? this.giphySearchService.getSearchSuggestions(term): of(({data: [], pagination: this.pagination, meta: { msg:'', response_id:'', status:404}}) as ApiResponse<Term>);
   }
 
   getGifs(search: string)  {
@@ -51,10 +55,21 @@ export class GiphyListComponent implements OnInit {
       distinctUntilChanged(),
       untilDestroyed(this),
       switchMap(searchText => {
+        this.pagination = { count: Config.GIFS_PER_PAGE, total_count: Config.GIFS_PER_PAGE*2 , offset: Config.OFFSET };
+        this.page = Config.OFFSET + 1;
         searchText = searchText !== '' ? searchText : null; 
         return this.getGifs(searchText)
       })
     ).subscribe(res => this.successCallback(res))
+  }
+
+  onPageChanged(event: number): void {
+    this.pagination = { ...this.pagination, offset : event - 1 };
+    this.searchGifs(this.searchFormControl.value).subscribe(res => {
+      this.pagination = res.pagination;
+      this.totalCount = this.pagination?.total_count ? (this.pagination?.total_count > this.totalCount ? this.totalCount : this.pagination?.total_count) : 18;
+      this.items = res.data;
+    });
   }
 
   successCallback(res: {gifsResult: ApiResponse<GifModel>,suggestionsResult: ApiResponse<Term> }){

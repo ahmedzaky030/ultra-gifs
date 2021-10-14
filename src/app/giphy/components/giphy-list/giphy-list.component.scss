@@ -13,7 +13,9 @@
 
 .pagination {
     margin: 2rem auto;
-    width: 30%;;
+    width: 30%;
+    border:2px solid gray;
+    height: fit-content;
 }
 .md-form {
     width: 50vw;

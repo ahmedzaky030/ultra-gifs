@@ -4,6 +4,6 @@ import { Pagination } from "./pagination.model";
 
 export interface ApiResponse<T> {
     data: T[] ,
-    pagination?: Pagination,
+    pagination: Pagination,
     meta: Meta
 }
