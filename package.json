@@ -6,13 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "lint": "npx lint-staged && pretty-quick --staged"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "ng test"
-    }
+    "test": "ng test ",
+    "lint": "npx lint-staged && pretty-quick --staged",
+    "e2e": " npx ng run imageShow:cypress-open"
   },
   "private": true,
   "dependencies": {
