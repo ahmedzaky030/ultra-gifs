@@ -32,7 +32,7 @@ export class GiphyListComponent implements OnInit {
   }
 
   ngOnInit(){  
-    this.getGifs(this.searchFormControl.value).subscribe(res => this.successCallback(res));
+    this.getGifsAndSuggestions(this.searchFormControl.value).subscribe(res => this.successCallback(res));
     this.onSearchChanged();
   }
 
@@ -45,7 +45,7 @@ export class GiphyListComponent implements OnInit {
     return term ? this.giphySearchService.getSearchSuggestions(term): of(({data: [], pagination: this.pagination, meta: { msg:'', response_id:'', status:404}}) as ApiResponse<Term>);
   }
 
-  getGifs(search: string)  {
+  getGifsAndSuggestions(search: string)  {
     return forkJoin({ gifsResult: this.searchGifs(search), suggestionsResult: this.getSearchSuggestions(search)});
   }
 
@@ -58,7 +58,7 @@ export class GiphyListComponent implements OnInit {
         this.pagination = { count: Config.GIFS_PER_PAGE, total_count: Config.GIFS_PER_PAGE*2 , offset: Config.OFFSET };
         this.page = Config.OFFSET + 1;
         searchText = searchText !== '' ? searchText : null; 
-        return this.getGifs(searchText)
+        return this.getGifsAndSuggestions(searchText)
       })
     ).subscribe(res => this.successCallback(res))
   }
